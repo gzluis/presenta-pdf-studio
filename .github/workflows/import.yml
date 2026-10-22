@@ -24,7 +24,7 @@ jobs:
           tar -tf /tmp/presenta-source.tar | grep -q 'Presenta_PDF_Studio/server.js'
           tar -xf /tmp/presenta-source.tar --strip-components=1
           rm -rf .bootstrap
-          rm -f .github/workflows/import.yml
+          rm -f .github/workflows/ci.yml
           npm run check
           npm test
       - name: Publish source to main
