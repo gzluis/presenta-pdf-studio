@@ -1,0 +1,38 @@
+name: Bootstrap Presenta PDF Studio
+on:
+  push:
+    paths:
+      - '.github/workflows/import.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  import-source:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - name: Unpack and verify source
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat .bootstrap/p0{1..7} | base64 --decode > /tmp/presenta-source.br
+          node -e "const fs=require('node:fs'); const zlib=require('node:zlib'); fs.writeFileSync('/tmp/presenta-source.tar',zlib.brotliDecompressSync(fs.readFileSync('/tmp/presenta-source.br')))"
+          tar -tf /tmp/presenta-source.tar | grep -q 'Presenta_PDF_Studio/server.js'
+          tar -xf /tmp/presenta-source.tar --strip-components=1
+          rm -rf .bootstrap
+          rm -f .github/workflows/import.yml
+          npm run check
+          npm test
+      - name: Publish source to main
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "feat: publish Presenta PDF Studio 2.0.0-beta.1"
+          git push origin HEAD:main
