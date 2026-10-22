@@ -1,0 +1,8 @@
+node_modules/
+salidas/
+.env
+*.log
+.DS_Store
+coverage/
+playwright-report/
+test-results/
